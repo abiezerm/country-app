@@ -1,0 +1,14 @@
+{
+    "cSpell.words": [
+        "daisyui"
+    ],
+    "angular-schematics.schematicsDefaultOptions": {
+        "angular-component": {
+            "skipChangeDetectionOnPush": true,
+            "skipPathSubfolder": true
+        },
+        "angular-*": {
+            "skipStyle": true
+        }
+    }
+}
