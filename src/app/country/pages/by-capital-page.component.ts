@@ -1,10 +1,9 @@
 import { Component, inject, resource, signal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { firstValueFrom, of } from 'rxjs';
 import { SearchInputComponent } from "../components/search-input.component";
 import { CountryListComponent } from "../components/country-list.component";
 import { CountryService } from '../services/country.service';
-import { RestCountry } from '../types/rest-countries.type';
-import { Country } from '../types/country.type';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-by-capital-page',
@@ -16,11 +15,12 @@ import { firstValueFrom } from 'rxjs';
       (value)="query.set($event)"
     />
 
-    @if(countryResource.error()) {
-      <h3 class="text-danger">{{ countryResource.error() }}</h3>
-    } @if(countryResource.hasValue()) {
-      <country-list [countries]="countryResource.value()" />
-    }
+    <country-list
+      [countries]="countryResource.value() ?? []"
+      [errorMessage]="countryResource.error()"
+      [isLoading]="countryResource.isLoading()"
+      [isEmpty]="countryResource.value()?.length === 0"
+    />
 
   `,
 })
@@ -28,14 +28,25 @@ export class ByCapitalPageComponent {
   private countryService = inject(CountryService);
   query = signal<string>('');
 
-  countryResource = resource({
+  countryResource = rxResource({
     request: () => ({ query: this.query() }),
-    loader: async ({ request }) => {
-      if(!request.query) return [];
+    loader: ({ request }) => {
+      if(!request.query) return of([]);
 
-      return firstValueFrom(this.countryService.searchByCapital(request.query));
+      return this.countryService.searchByCapital(request.query);
     }
-  });
+
+  })
+
+  // Normal Resource
+  // countryResource = resource({
+  //   request: () => ({ query: this.query() }),
+  //   loader: async ({ request }) => {
+  //     if(!request.query) return [];
+
+  //     return firstValueFrom(this.countryService.searchByCapital(request.query));
+  //   }
+  // });
 
   // OLD Way
   // isLoading = signal(false);

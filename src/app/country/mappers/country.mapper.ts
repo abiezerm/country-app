@@ -10,6 +10,8 @@ export class CountryMapper {
             flagSvg: restCountry.flags.svg,
             name: restCountry.name.common,
             population: restCountry.population,
+            region: restCountry.region,
+            subregion: restCountry.subregion,
         };
     }
 
